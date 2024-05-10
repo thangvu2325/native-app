@@ -9,7 +9,7 @@ import {
   StyleSheet,
   Alert,
 } from "react-native";
-import { Button, Divider, TextInput } from "react-native-paper";
+import { Button, Divider, IconButton, TextInput } from "react-native-paper";
 import { ErrorInfo, useEffect, useState } from "react";
 import Colors from "@/constants/Colors";
 import { Controller, useForm } from "react-hook-form";
@@ -20,6 +20,7 @@ import { useAuth } from "@/redux/selector";
 import { createAxios } from "@/services/createInstance";
 import { TokenData } from "@/types";
 import { loginSuccess } from "@/redux/slices/authSlice";
+import TextInputIcon from "react-native-paper/lib/typescript/components/TextInput/Adornment/TextInputIcon";
 
 export type signInType = {
   email: string;
@@ -145,7 +146,7 @@ export default function SignIn() {
                     onChangeText={onChange}
                     onBlur={onBlur}
                     right={
-                      <TextInput.Icon
+                      <IconButton
                         icon={
                           secureTextEntry ? "eye-off-outline" : "eye-outline"
                         }

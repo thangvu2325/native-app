@@ -1,6 +1,6 @@
 import { Text, View } from "@/components/Themed";
 import { Alert, StyleSheet, useColorScheme } from "react-native";
-import { Button, RadioButton, TextInput } from "react-native-paper";
+import { Button, IconButton, RadioButton, TextInput } from "react-native-paper";
 import { zodResolver } from "@hookform/resolvers/zod";
 import React, { useContext, useEffect, useState } from "react";
 import { SignUpContext } from "./_layout";
@@ -10,10 +10,6 @@ import { z } from "zod";
 import authService from "@/services/authService";
 import { useRouter } from "expo-router";
 import { useAppDispatch, useAppSelector } from "@/redux/hook";
-import { useAuth } from "@/redux/selector";
-import { createAxios } from "@/services/createInstance";
-import { TokenData } from "@/types";
-import { loginSuccess } from "@/redux/slices/authSlice";
 
 type SignUpForm = {
   email: string;
@@ -224,7 +220,7 @@ export default function SignUp() {
                 onChangeText={onChange}
                 onBlur={onBlur}
                 right={
-                  <TextInput.Icon
+                  <IconButton
                     icon={"account"}
                     onPress={() => {
                       setSecureTextEntry(!secureTextEntry);

@@ -1,15 +1,19 @@
 import { Text, View } from "@/components/Themed";
 import { FunctionComponent, useEffect, useState } from "react";
-import {
-  CameraView,
-  CameraType,
-  BarcodeScanningResult,
-  Camera,
-} from "expo-camera/next";
 import jsQR from "jsqr";
+import {
+  BarcodeScanningResult,
+  BarcodeType,
+  CameraType,
+  CameraView,
+  useCameraPermissions,
+} from "expo-camera";
+
+import { BarCodeScanner } from "expo-barcode-scanner";
+
 import * as FileSystem from "expo-file-system";
 import * as ImagePicker from "expo-image-picker";
-import { StyleSheet, useColorScheme } from "react-native";
+import { Button, StyleSheet, useColorScheme } from "react-native";
 import { ActivityIndicator, Appbar, IconButton } from "react-native-paper";
 import { useRouter } from "expo-router";
 import Colors from "@/constants/Colors";
@@ -22,7 +26,7 @@ import { loginSuccess } from "@/redux/slices/authSlice";
 import { TokenData } from "@/types";
 import { fetchDataDevices } from "@/redux/slices/deviceSlice";
 export default function ScanQRScreen() {
-  const [hasPermission, setHasPermission] = useState<boolean | null>(null);
+  const [permission, requestPermission] = useCameraPermissions();
   const [scanned, setScanned] = useState(false);
   const [facing, setFacing] = useState<CameraType>("back");
   const [image, setImage] = useState("");
@@ -37,17 +41,21 @@ export default function ScanQRScreen() {
   const route = useRouter();
   const [isFlipLoading, setIsFlipLoading] = useState<boolean>(false);
   const [flashMode, setFlashMode] = useState<boolean>(false);
-  useEffect(() => {
-    (async () => {
-      const { status } = await Camera.requestCameraPermissionsAsync();
-      setHasPermission(status === "granted");
-    })();
-  }, []);
-  if (hasPermission === null) {
+  if (!permission) {
+    // Camera permissions are still loading.
     return <View />;
   }
-  if (hasPermission === false) {
-    return <Text>No access to camera</Text>;
+
+  if (!permission.granted) {
+    // Camera permissions are not granted yet.
+    return (
+      <View style={styles.container}>
+        <Text style={{ textAlign: "center" }}>
+          We need your permission to show the camera
+        </Text>
+        <Button onPress={requestPermission} title="grant permission" />
+      </View>
+    );
   }
   const pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
@@ -93,21 +101,15 @@ export default function ScanQRScreen() {
   const toggleFlash = () => {
     setFlashMode(!flashMode);
   };
-  function toggleCameraType() {
-    setIsFlipLoading(true);
+  function toggleCameraFacing() {
     setFacing((current) => (current === "back" ? "front" : "back"));
-
-    setTimeout(() => {
-      setIsFlipLoading(false);
-    }, 1000);
   }
-  const handleBarCodeScanned = async ({
-    type,
-    data,
-  }: BarcodeScanningResult) => {
+  const handleBarCodeScanned = async (
+    scanningResult: BarcodeScanningResult
+  ) => {
     setScanned(true);
     try {
-      const dataReq = JSON.parse(data);
+      const dataReq = JSON.parse(scanningResult.data);
       const res = await userService.addDeviceforUser(
         axiosClient,
         currentUser?.user.customer_id ?? "",
@@ -251,7 +253,7 @@ export default function ScanQRScreen() {
               icon="camera-flip"
               iconColor={"#fff"}
               size={26}
-              onPress={toggleCameraType}
+              onPress={toggleCameraFacing}
               loading={isFlipLoading}
             />
           </View>

@@ -7,7 +7,7 @@ const getAllDevices = async (
 ) => {
   try {
     console.log(config.baseUrl);
-    const res = await axiosClient.get("/devices/customers" + customer_id);
+    const res = await axiosClient.get("/devices/customers/" + customer_id);
     return res.data;
   } catch (error) {
     console.log(error);

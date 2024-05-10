@@ -13,6 +13,9 @@ const messageConnection = (token: string, customer_id: string) => {
 const messageDeviceReceived = (handleMessage: (message: string) => void) => {
   socketService.subscribeToDeviceMessages(handleMessage);
 };
+const messageFireWarning = (handleMessage: (message: string) => void) => {
+  socketService.subscribeToWarningMessages(handleMessage);
+};
 const messageReiceved = () => {
   socketService.subscribeToMessages((message) => {
     return message;
@@ -31,5 +34,6 @@ const useMessage = () => ({
   messageDisconnect,
   messageSent,
   messageDeviceReceived,
+  messageFireWarning,
 });
 export default useMessage;

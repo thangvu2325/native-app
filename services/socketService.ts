@@ -41,6 +41,11 @@ class SocketService {
   ) {
     this.socket.on("deviceMessage", messageHandler);
   }
+  subscribeToWarningMessages(
+    messageHandler: ServerToClientEvents["fireWarning"]
+  ) {
+    this.socket.on("fireWarning", messageHandler);
+  }
   subscribeToMessages(messageHandler: ServerToClientEvents["message"]) {
     this.socket.on("message", messageHandler);
   }

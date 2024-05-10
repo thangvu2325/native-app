@@ -17,13 +17,15 @@ import { updateDevices } from "@/redux/slices/deviceSlice";
 import { AppDispatch } from "@/redux/store";
 import { Dispatch } from "@reduxjs/toolkit";
 import axios, { AxiosInstance } from "axios";
-import { Router } from "expo-router";
-const { messageConnection, messageDeviceReceived } = useMessage();
+import { router } from "expo-router";
+import { ExpoRouter } from "expo-router/types/expo-router";
+const { messageConnection, messageDeviceReceived, messageFireWarning } =
+  useMessage();
 
 const register = async (
   data: userRegister,
   dispatch: Dispatch,
-  router: Router
+  router: ExpoRouter.Router
 ) => {
   try {
     dispatch(registerStart());
@@ -64,7 +66,7 @@ const checkPhoneValid = async (phone: string) => {
 const checkActive = async (
   axiosClient: AxiosInstance,
   userId: string,
-  router: Router
+  router: ExpoRouter.Router
 ) => {
   try {
     const res = await axiosClient.post(`${config.baseUrl}/auth/checkactive`, {
@@ -88,7 +90,11 @@ const resendVerifyKey = async (data: { email: string }) => {
     throw error;
   }
 };
-const login = async (data: userLogin, dispatch: Dispatch, router: Router) => {
+const login = async (
+  data: userLogin,
+  dispatch: Dispatch,
+  router: ExpoRouter.Router
+) => {
   try {
     dispatch(loginStart());
     const res = await axios.post(config.baseUrl + "/auth/login", data);
@@ -99,6 +105,9 @@ const login = async (data: userLogin, dispatch: Dispatch, router: Router) => {
     );
     await messageDeviceReceived((message) => {
       dispatch(updateDevices(JSON.parse(message)));
+    });
+    await messageFireWarning((message) => {
+      console.log(message);
     });
     router.push("/(home)/");
     return res.data;

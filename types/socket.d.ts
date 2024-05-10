@@ -18,6 +18,7 @@ export interface AddMessageType {
 export type ServerToClientEvents = {
   message: (data: string) => void;
   deviceMessage: (data: IMessage) => void;
+  fireWarning: (data: IMessage) => void;
 };
 
 export interface ClientToServerEvents {
