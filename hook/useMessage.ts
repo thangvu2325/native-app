@@ -11,6 +11,7 @@ const messageConnection = (token: string, customer_id: string) => {
   socketService.connectWithAuthToken(token, customer_id, headers);
 };
 const messageDeviceReceived = (handleMessage: (message: string) => void) => {
+  console.log(1);
   socketService.subscribeToDeviceMessages(handleMessage);
 };
 const messageFireWarning = (handleMessage: (message: string) => void) => {

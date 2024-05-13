@@ -115,6 +115,12 @@ export default function ScanQRScreen() {
         currentUser?.user.customer_id ?? "",
         dataReq
       );
+      dispatch(
+        fetchDataDevices({
+          axiosClient,
+          customer_id: currentUser?.user.customer_id ?? "",
+        })
+      );
       route.back();
       alert(res.result + "1");
     } catch (error) {

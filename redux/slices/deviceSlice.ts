@@ -52,11 +52,12 @@ export const deviceSlice = createSlice({
         console.log("Không tìm thấy thiết bị");
         return;
       }
-
-      const updatedDevice = {
+      const updatedDevice: deviceType = {
         ...state.data.devices[index],
         updatedAt:
           action.payload?.updatedAt ?? state.data.devices[index].updatedAt,
+        createdAt:
+          action.payload?.createdAt ?? state.data.devices[index].createdAt,
         sensors: {
           ...state.data.devices[index].sensors,
           ...action.payload.sensors,

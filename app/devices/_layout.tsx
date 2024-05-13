@@ -1,9 +1,18 @@
-import { Redirect, Slot, router, usePathname } from "expo-router";
-import { FunctionComponent } from "react";
+import {
+  Redirect,
+  Slot,
+  router,
+  useLocalSearchParams,
+  usePathname,
+} from "expo-router";
+import { FunctionComponent, useEffect } from "react";
 import { Button } from "react-native-paper";
 import LayoutHasHeader from "@/layouts/LayoutHasHeader";
 import { useAppSelector } from "@/redux/hook";
 import { useAuth } from "@/redux/selector";
+import useMessage from "@/hook/useMessage";
+import { useDispatch } from "react-redux";
+import { updateDevices } from "@/redux/slices/deviceSlice";
 
 interface DeviceLayoutProps {}
 export const unstable_settings = {
@@ -11,8 +20,17 @@ export const unstable_settings = {
 };
 const DeviceLayout: FunctionComponent<DeviceLayoutProps> = () => {
   const pathname = usePathname();
-  console.log(pathname);
-
+  const local = useLocalSearchParams();
+  const dispatch = useDispatch();
+  const { messageDeviceReceived } = useMessage();
+  useEffect(() => {
+    const handleListenDevice = async () => {
+      await messageDeviceReceived((message) => {
+        dispatch(updateDevices(JSON.parse(message)));
+      });
+    };
+    handleListenDevice();
+  }, []);
   const { isLogin } = useAppSelector(useAuth);
   if (!isLogin) {
     // On web, static rendering will stop here as the user is not authenticated
@@ -29,7 +47,7 @@ const DeviceLayout: FunctionComponent<DeviceLayoutProps> = () => {
           labelStyle={{
             fontSize: 16,
           }}
-          onPress={() => router.push("/")}
+          onPress={() => router.push(`/devices/${local.deviceId}/history`)}
         >
           Lịch sử thiết bị
         </Button>

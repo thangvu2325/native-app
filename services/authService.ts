@@ -19,8 +19,7 @@ import { Dispatch } from "@reduxjs/toolkit";
 import axios, { AxiosInstance } from "axios";
 import { router } from "expo-router";
 import { ExpoRouter } from "expo-router/types/expo-router";
-const { messageConnection, messageDeviceReceived, messageFireWarning } =
-  useMessage();
+const { messageConnection } = useMessage();
 
 const register = async (
   data: userRegister,
@@ -103,13 +102,10 @@ const login = async (
       res.data?.backendTokens.accessToken,
       res.data?.user.id
     );
-    await messageDeviceReceived((message) => {
-      dispatch(updateDevices(JSON.parse(message)));
-    });
-    await messageFireWarning((message) => {
-      console.log(message);
-    });
-    router.push("/(home)/");
+    // await messageDeviceReceived((message) => {
+    //   dispatch(updateDevices(JSON.parse(message)));
+    // });
+    router.push("/(app)/");
     return res.data;
   } catch (error: any) {
     dispatch(loginFailed(error.response.data.message));

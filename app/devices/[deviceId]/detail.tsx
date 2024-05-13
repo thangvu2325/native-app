@@ -1,15 +1,14 @@
 import { Text, View } from "@/components/Themed";
 import FieldList, { item } from "@/components/ui/FieldList";
 import { FunctionComponent, useContext, useEffect } from "react";
-import { Button, Divider } from "react-native-paper";
-import { Pressable, ScrollView } from "react-native";
+import { Button, Divider, IconButton, Tooltip } from "react-native-paper";
+import { ScrollView } from "react-native";
 import { LayoutHasHeaderContext } from "@/layouts/LayoutHasHeader";
 import { useLocalSearchParams, usePathname } from "expo-router";
 import { useAppSelector } from "@/redux/hook";
 import { deviceSelector } from "@/redux/selector";
-import { NumberArray } from "react-native-svg";
 import formatTimeDifference from "@/lib/formatTime";
-import Field from "@/components/ui/Field";
+import Ionicons from "@expo/vector-icons/Ionicons";
 
 interface DetailScrrenProps {}
 const items: (props: {
@@ -29,32 +28,19 @@ const items: (props: {
   },
   {
     itemKey: 3,
-    left: <Text style={{ fontSize: 14, fontWeight: "600" }}>Imsi</Text>,
+    left: (
+      <View style={{ flexDirection: "row", alignContent: "center", gap: 6 }}>
+        <Text style={{ fontSize: 14, fontWeight: "600" }}>Imsi</Text>
+        <Tooltip title="Selected Camera" enterTouchDelay={100}>
+          <Ionicons name="information-circle-outline" size={20} color="black" />
+        </Tooltip>
+      </View>
+    ),
     right: imsi ?? 0,
   },
 ];
+
 const signalItems: (props: {
-  band: string;
-  deviceNetworkRssiDbm: string | NumberArray;
-}) => item[] = ({ band, deviceNetworkRssiDbm }) => [
-  {
-    itemKey: 1,
-    left: (
-      <Text style={{ fontSize: 14, fontWeight: "600" }}>Băng Tần ( BW )</Text>
-    ),
-    right: band,
-  },
-  {
-    itemKey: 2,
-    left: (
-      <Text style={{ fontSize: 14, fontWeight: "600" }}>
-        Cường độ tín hiệu thu (RSSI)
-      </Text>
-    ),
-    right: deviceNetworkRssiDbm,
-  },
-];
-const networkItems: (props: {
   Operator?: string;
   band?: number;
   EARFCN?: number;
@@ -71,65 +57,149 @@ const networkItems: (props: {
 }) => item[] = (props) => [
   {
     itemKey: 1,
-    left: <Text style={{ fontSize: 14, fontWeight: "600" }}>Operator</Text>,
+    left: (
+      <View style={{ flexDirection: "row", alignContent: "center", gap: 6 }}>
+        <Text style={{ fontSize: 14, fontWeight: "600" }}>Operator</Text>
+        <Tooltip title="Selected Camera" enterTouchDelay={100}>
+          <Ionicons name="information-circle-outline" size={20} color="black" />
+        </Tooltip>
+      </View>
+    ),
     right: props.Operator,
   },
   {
     itemKey: 2,
-    left: <Text style={{ fontSize: 14, fontWeight: "600" }}>band</Text>,
+    left: (
+      <View style={{ flexDirection: "row", alignContent: "center", gap: 6 }}>
+        <Text style={{ fontSize: 14, fontWeight: "600" }}>band</Text>
+        <Tooltip title="Selected Camera" enterTouchDelay={100}>
+          <Ionicons name="information-circle-outline" size={20} color="black" />
+        </Tooltip>
+      </View>
+    ),
     right: props.band,
   },
   {
     itemKey: 3,
-    left: <Text style={{ fontSize: 14, fontWeight: "600" }}>EARFCN</Text>,
+    left: (
+      <View style={{ flexDirection: "row", alignContent: "center", gap: 6 }}>
+        <Text style={{ fontSize: 14, fontWeight: "600" }}>EARFCN</Text>
+        <Tooltip title="Selected Camera" enterTouchDelay={100}>
+          <Ionicons name="information-circle-outline" size={20} color="black" />
+        </Tooltip>
+      </View>
+    ),
     right: props.EARFCN,
   },
   {
     itemKey: 5,
-    left: <Text style={{ fontSize: 14, fontWeight: "600" }}>PCI</Text>,
+    left: (
+      <View style={{ flexDirection: "row", alignContent: "center", gap: 6 }}>
+        <Text style={{ fontSize: 14, fontWeight: "600" }}>PCI</Text>
+        <Tooltip title="Selected Camera" enterTouchDelay={100}>
+          <Ionicons name="information-circle-outline" size={20} color="black" />
+        </Tooltip>
+      </View>
+    ),
     right: props.PCI,
   },
   {
     itemKey: 6,
     left: (
-      <Text style={{ fontSize: 14, fontWeight: "600" }}>connectionStatus</Text>
+      <View style={{ flexDirection: "row", alignContent: "center", gap: 6 }}>
+        <Text style={{ fontSize: 14, fontWeight: "600" }}>
+          connectionStatus
+        </Text>
+        <Tooltip title="Selected Camera" enterTouchDelay={100}>
+          <Ionicons name="information-circle-outline" size={20} color="black" />
+        </Tooltip>
+      </View>
     ),
     right: props.connectionStatus,
   },
   {
     itemKey: 7,
     lelftStyle: { width: 200 },
-    left: <Text style={{ fontSize: 14, fontWeight: "600" }}>ipAddress</Text>,
+    left: (
+      <View style={{ flexDirection: "row", alignContent: "center", gap: 6 }}>
+        <Text style={{ fontSize: 14, fontWeight: "600" }}>ipAddress</Text>
+        <Tooltip title="Selected Camera" enterTouchDelay={100}>
+          <Ionicons name="information-circle-outline" size={20} color="black" />
+        </Tooltip>
+      </View>
+    ),
     right: props.ipAddress,
   },
   {
     itemKey: 8,
-    left: <Text style={{ fontSize: 14, fontWeight: "600" }}>RSRP</Text>,
+    left: (
+      <View style={{ flexDirection: "row", alignContent: "center", gap: 6 }}>
+        <Text style={{ fontSize: 14, fontWeight: "600" }}>RSRP</Text>
+        <Tooltip title="Selected Camera" enterTouchDelay={100}>
+          <Ionicons name="information-circle-outline" size={20} color="black" />
+        </Tooltip>
+      </View>
+    ),
     right: props.RSRP,
   },
   {
     itemKey: 9,
-    left: <Text style={{ fontSize: 14, fontWeight: "600" }}>RSSI</Text>,
+    left: (
+      <View style={{ flexDirection: "row", alignContent: "center", gap: 6 }}>
+        <Text style={{ fontSize: 14, fontWeight: "600" }}>RSSI</Text>
+        <Tooltip title="Selected Camera" enterTouchDelay={100}>
+          <Ionicons name="information-circle-outline" size={20} color="black" />
+        </Tooltip>
+      </View>
+    ),
     right: props.RSSI,
   },
   {
     itemKey: 10,
-    left: <Text style={{ fontSize: 14, fontWeight: "600" }}>RSRQ</Text>,
+    left: (
+      <View style={{ flexDirection: "row", alignContent: "center", gap: 6 }}>
+        <Text style={{ fontSize: 14, fontWeight: "600" }}>RSRQ</Text>
+        <Tooltip title="Selected Camera" enterTouchDelay={100}>
+          <Ionicons name="information-circle-outline" size={20} color="black" />
+        </Tooltip>
+      </View>
+    ),
     right: props.RSRQ,
   },
   {
     itemKey: 11,
-    left: <Text style={{ fontSize: 14, fontWeight: "600" }}>T3324</Text>,
+    left: (
+      <View style={{ flexDirection: "row", alignContent: "center", gap: 6 }}>
+        <Text style={{ fontSize: 14, fontWeight: "600" }}>T3324</Text>
+        <Tooltip title="Selected Camera" enterTouchDelay={100}>
+          <Ionicons name="information-circle-outline" size={20} color="black" />
+        </Tooltip>
+      </View>
+    ),
     right: props.T3324,
   },
   {
     itemKey: 12,
-    left: <Text style={{ fontSize: 14, fontWeight: "600" }}>T3412</Text>,
+    left: (
+      <View style={{ flexDirection: "row", alignContent: "center", gap: 6 }}>
+        <Text style={{ fontSize: 14, fontWeight: "600" }}>T3412</Text>
+        <Tooltip title="Selected Camera" enterTouchDelay={100}>
+          <Ionicons name="information-circle-outline" size={20} color="black" />
+        </Tooltip>
+      </View>
+    ),
     right: props.T3412,
   },
   {
     itemKey: 13,
-    left: <Text style={{ fontSize: 14, fontWeight: "600" }}>tac</Text>,
+    left: (
+      <View style={{ flexDirection: "row", alignContent: "center", gap: 6 }}>
+        <Text style={{ fontSize: 14, fontWeight: "600" }}>tac</Text>
+        <Tooltip title="Selected Camera" enterTouchDelay={100}>
+          <Ionicons name="information-circle-outline" size={20} color="black" />
+        </Tooltip>
+      </View>
+    ),
     right: props.tac,
   },
   {
@@ -168,7 +238,7 @@ const DetailScrren: FunctionComponent<DetailScrrenProps> = () => {
         title={<Text style={{ fontSize: 18 }}>Mạng</Text>}
         style={{ marginTop: 0 }}
         items={(() =>
-          networkItems({
+          signalItems({
             ...deviceFound?.signal,
             updatedAt: deviceFound?.updatedAt,
           }))()}

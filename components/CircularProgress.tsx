@@ -23,7 +23,7 @@ const CircularProgress: FunctionComponent<CircularProgressProps> = ({
   const radius = 70;
   const circleCircumference = 2 * Math.PI * radius;
 
-  const percentage = (value / targetValue) * 100;
+  const percentage = Math.round((value / targetValue) * 100);
   const strokeDashoffset =
     circleCircumference - (circleCircumference * percentage) / 100;
 

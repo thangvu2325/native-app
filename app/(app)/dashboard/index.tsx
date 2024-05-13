@@ -9,7 +9,6 @@ import {
 import { Text, View } from "@/components/Themed";
 import { FontAwesome } from "@expo/vector-icons";
 import { MaterialIcons } from "@expo/vector-icons";
-import { AntDesign } from "@expo/vector-icons";
 
 import {
   Avatar,
@@ -28,11 +27,13 @@ import { router, useRouter } from "expo-router";
 import { useAppDispatch, useAppSelector } from "@/redux/hook";
 import { deviceSelector } from "@/redux/selector";
 import formatTimeDifference from "@/lib/formatTime";
+import useMessage from "@/hook/useMessage";
+import { updateDevices } from "@/redux/slices/deviceSlice";
 
 export default function TabTwoScreen() {
   // Animated FAB
   const [isExtended, setIsExtended] = React.useState(true);
-
+  const { messageDeviceReceived } = useMessage();
   const isIOS = Platform.OS === "ios";
   const colorScheme = useColorScheme();
   const onScroll = ({ nativeEvent }: { nativeEvent: any }) => {
@@ -42,8 +43,16 @@ export default function TabTwoScreen() {
     setIsExtended(currentScrollPosition <= 0);
   };
   const route = useRouter();
+  const dispatch = useAppDispatch();
   // const fabStyle = { [animateFrom]: 16 };
-
+  React.useEffect(() => {
+    const handleListenDevice = async () => {
+      await messageDeviceReceived((message) => {
+        dispatch(updateDevices(JSON.parse(message)));
+      });
+    };
+    handleListenDevice();
+  }, []);
   // Search Bar
   const [searchQuery, setSearchQuery] = React.useState("");
   const deviceList = useAppSelector(deviceSelector).data
@@ -78,8 +87,9 @@ export default function TabTwoScreen() {
                 const openMenu = () => setVisible(true);
 
                 const closeMenu = () => setVisible(false);
+                const voltage = device?.battery?.voltage || 3000;
                 const percentBattery = Math.round(
-                  ((3.6 - device?.battery?.voltage ?? 3.0) * 1000) / 6
+                  ((600 - (3600 - voltage)) * 100) / 600
                 );
                 return (
                   <React.Fragment key={device.id}>

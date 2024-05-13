@@ -1,9 +1,13 @@
-import { FunctionComponent } from "react";
+import { FunctionComponent, useContext } from "react";
 import { ScrollView, useColorScheme } from "react-native";
 import { Text, View } from "@/components/Themed";
 import { Divider } from "react-native-paper";
 
 import Colors from "@/constants/Colors";
+import { useLocalSearchParams } from "expo-router";
+import { useAppSelector } from "@/redux/hook";
+import { deviceSelector } from "@/redux/selector";
+import { HistoryContext } from "../_layout";
 
 interface HistoryNotifyScreenProps {}
 const HistoryField: FunctionComponent<{
@@ -21,6 +25,7 @@ const HistoryField: FunctionComponent<{
       textColor: "#fff",
     };
   };
+
   return (
     <View style={{ marginTop: 12 }}>
       <Text style={{ marginLeft: 16 }}>{time}</Text>
@@ -41,16 +46,32 @@ const HistoryField: FunctionComponent<{
   );
 };
 const HistoryNotifyScreen: FunctionComponent<HistoryNotifyScreenProps> = () => {
+  const local = useLocalSearchParams();
+  const deviceFound = useAppSelector(deviceSelector)?.data?.devices.find(
+    (device) => device?.deviceId === local?.deviceId
+  );
+  const { startDate, endDate } = useContext(HistoryContext);
   return (
     <ScrollView style={{ marginRight: 32, borderRightWidth: 1 }}>
-      <HistoryField
-        time="Hôm nay"
-        content="Phát hiện bất thường"
-      ></HistoryField>
-      <HistoryField
-        time="Hôm nay"
-        content="Phát hiện bất thường"
-      ></HistoryField>
+      {/* {deviceFound?.warningLogs.length
+        ? deviceFound.warningLogs.map((warning) => (
+            <HistoryField
+              key={warning.id}
+              time={new Date(warning.updatedAt)
+                .toISOString()
+                .replace(/T/, " ")
+                .replace(/\..+/, "")
+                .split(" ")
+                .map((part) => {
+                  const [year, month, day] = part.split("-");
+                  return year.length === 4 ? `${day}-${month}-${year}` : part;
+                })
+                .reverse()
+                .join(" - ")}
+              content={warning.message}
+            ></HistoryField>
+          ))
+        : ""} */}
     </ScrollView>
   );
 };

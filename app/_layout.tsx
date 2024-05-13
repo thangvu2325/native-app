@@ -8,7 +8,7 @@ import { enGB, registerTranslation } from "react-native-paper-dates";
 import { useFonts } from "expo-font";
 import { Stack, router, useRouter } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
-import { useEffect, useRef, useState } from "react";
+import { createContext, useContext, useEffect, useRef, useState } from "react";
 import { useColorScheme } from "@/components/useColorScheme";
 import { Provider } from "react-native-paper";
 import { Provider as ProvideRedux } from "react-redux";
@@ -56,7 +56,11 @@ export const unstable_settings = {
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
-
+export const RootContext = createContext({
+  expoPushToken: "",
+} as {
+  expoPushToken: string;
+});
 export default function RootLayout() {
   const [loaded, error] = useFonts({
     SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
@@ -90,25 +94,25 @@ Notifications.setNotificationHandler({
   }),
 });
 
-async function sendPushNotification(expoPushToken: string) {
-  const message = {
-    to: expoPushToken,
-    sound: "default",
-    title: "Original Title",
-    body: "And here is the body!",
-    data: { someData: "goes here" },
-  };
+// async function sendPushNotification(expoPushToken: string) {
+//   const message = {
+//     to: expoPushToken,
+//     sound: "default",
+//     title: "Original Title",
+//     body: "And here is the body!",
+//     data: { someData: "goes here" },
+//   };
 
-  await fetch("https://exp.host/--/api/v2/push/send", {
-    method: "POST",
-    headers: {
-      Accept: "application/json",
-      "Accept-encoding": "gzip, deflate",
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(message),
-  });
-}
+//   await fetch("https://exp.host/--/api/v2/push/send", {
+//     method: "POST",
+//     headers: {
+//       Accept: "application/json",
+//       "Accept-encoding": "gzip, deflate",
+//       "Content-Type": "application/json",
+//     },
+//     body: JSON.stringify(message),
+//   });
+// }
 
 function handleRegistrationError(errorMessage: string) {
   alert(errorMessage);
@@ -146,6 +150,7 @@ async function registerForPushNotificationsAsync() {
       handleRegistrationError("Project ID not found");
     }
     try {
+      console.log(projectId);
       const pushTokenString = (
         await Notifications.getExpoPushTokenAsync({
           projectId,
@@ -170,11 +175,14 @@ function RootLayoutNav() {
   const responseListener = useRef<Notifications.Subscription>();
   useEffect(() => {
     registerForPushNotificationsAsync()
-      .then((token) => setExpoPushToken(token ?? ""))
+      .then((token) => {
+        return setExpoPushToken(token ?? "");
+      })
       .catch((error: any) => setExpoPushToken(`${error}`));
 
     notificationListener.current =
       Notifications.addNotificationReceivedListener((notification) => {
+        console.log(notification);
         setNotification(notification);
       });
 
@@ -192,27 +200,36 @@ function RootLayoutNav() {
         Notifications.removeNotificationSubscription(responseListener.current);
     };
   }, []);
-  console.log(expoPushToken);
-  console.log(notification);
 
   return (
-    <PersistGate loading={null} persistor={persistor}>
-      <ProvideRedux store={store}>
-        <SessionProvider>
-          <Provider>
-            <ThemeProvider
-              value={colorScheme === "dark" ? DarkTheme : DefaultTheme}
-            >
-              <Stack>
-                <Stack.Screen name="(app)" options={{ headerShown: false }} />
-                <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-                <Stack.Screen name="(home)" options={{ headerShown: false }} />
-                <Stack.Screen name="devices" options={{ headerShown: false }} />
-              </Stack>
-            </ThemeProvider>
-          </Provider>
-        </SessionProvider>
-      </ProvideRedux>
-    </PersistGate>
+    <RootContext.Provider value={{ expoPushToken: expoPushToken }}>
+      <PersistGate loading={null} persistor={persistor}>
+        <ProvideRedux store={store}>
+          <SessionProvider>
+            <Provider>
+              <ThemeProvider
+                value={colorScheme === "dark" ? DarkTheme : DefaultTheme}
+              >
+                <Stack>
+                  <Stack.Screen name="(app)" options={{ headerShown: false }} />
+                  <Stack.Screen
+                    name="(auth)"
+                    options={{ headerShown: false }}
+                  />
+                  <Stack.Screen
+                    name="(branch)"
+                    options={{ headerShown: false }}
+                  />
+                  <Stack.Screen
+                    name="devices"
+                    options={{ headerShown: false }}
+                  />
+                </Stack>
+              </ThemeProvider>
+            </Provider>
+          </SessionProvider>
+        </ProvideRedux>
+      </PersistGate>
+    </RootContext.Provider>
   );
 }

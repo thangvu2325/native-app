@@ -4,7 +4,8 @@ import config from "../config";
 import { TokenData } from "@/types";
 import { AppDispatch } from "@/redux/store";
 import { ActionCreatorWithPayload, Dispatch } from "@reduxjs/toolkit";
-
+import useMessage from "@/hook/useMessage";
+const { messageConnection } = useMessage();
 export async function refreshToken(
   token: TokenData,
   dispatch: Dispatch,
@@ -18,11 +19,17 @@ export async function refreshToken(
         headers: {
           "Content-Type": "application/json",
           Accept: "application/json",
-          authorization: "Refresh " + token.backendTokens.refreshToken,
+          authorization: "Refresh " + token?.backendTokens.refreshToken,
         },
       }
     );
-
+    await messageConnection(
+      res.data?.backendTokens.accessToken,
+      res.data?.user.id
+    );
+    // await messageDeviceReceived((message) => {
+    //   dispatch(updateDevices(JSON.parse(message)));
+    // });
     const response = await res.data;
     dispatch(stateSuccess(response));
 
@@ -51,7 +58,7 @@ export const createAxios = (
   newInstance.interceptors.request.use(
     async (config) => {
       try {
-        if (new Date().getTime() > token.backendTokens.expiresIn) {
+        if (new Date().getTime() > token?.backendTokens.expiresIn) {
           console.log("Token is expired. Refreshing...");
           const tokenData = await refreshToken(token, dispatch, stateSuccess);
           if (tokenData === null) {
@@ -59,11 +66,11 @@ export const createAxios = (
           }
           console.log("Token refreshed:", tokenData);
           config.headers["Authorization"] =
-            "Bearer " + tokenData.backendTokens.accessToken;
+            "Bearer " + tokenData?.backendTokens.accessToken;
         } else {
           console.log("Token is still valid.");
           config.headers["Authorization"] =
-            "Bearer " + token.backendTokens.accessToken;
+            "Bearer " + token?.backendTokens.accessToken;
         }
         return config;
       } catch (error) {

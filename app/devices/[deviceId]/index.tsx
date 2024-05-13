@@ -1,7 +1,12 @@
 import CircularProgress from "@/components/CircularProgress";
 import { Text, View } from "@/components/Themed";
 import { FunctionComponent, useContext, useEffect, useState } from "react";
-import { SafeAreaView, ImageBackground, useColorScheme } from "react-native";
+import {
+  SafeAreaView,
+  ImageBackground,
+  useColorScheme,
+  Alert,
+} from "react-native";
 import {
   Button,
   Dialog,
@@ -15,10 +20,14 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useGlobalSearchParams, useRouter } from "expo-router";
 import { LayoutHasHeaderContext } from "@/layouts/LayoutHasHeader";
 import { useLocalSearchParams } from "expo-router";
-import { useAppSelector } from "@/redux/hook";
-import { deviceSelector } from "@/redux/selector";
+import { useAppDispatch, useAppSelector } from "@/redux/hook";
+import { deviceSelector, useAuth } from "@/redux/selector";
 import formatTimeDifference from "@/lib/formatTime";
-import { deviceType } from "@/types";
+import { TokenData, deviceType } from "@/types";
+import devicesService from "@/services/deviceService";
+import { createAxios } from "@/services/createInstance";
+import { loginSuccess } from "@/redux/slices/authSlice";
+import { fetchDataDevices } from "@/redux/slices/deviceSlice";
 
 interface DeviceScreenProps {} // Extend with StackScreenProps
 
@@ -27,28 +36,58 @@ const DeviceScreen: FunctionComponent<DeviceScreenProps> = () => {
   useEffect(() => {
     setTitle("Thiết Bị 1");
   }, []);
+  const dispatch = useAppDispatch();
+  const { isLogin, currentUser } = useAppSelector(useAuth);
+  const axiosClient = createAxios(
+    currentUser as TokenData,
+    dispatch,
+    loginSuccess
+  );
   const colorScheme = useColorScheme();
   // Switch
-  const [isSwitchOn, setIsSwitchOn] = useState(false);
 
-  const onToggleSwitch = () => setIsSwitchOn(!isSwitchOn);
   const local = useLocalSearchParams();
   const deviceList = useAppSelector(deviceSelector).data?.devices;
   const deviceFound = deviceList.find(
     (device) => device.deviceId === local.deviceId
   ) as deviceType;
+  const [isSwitchOn, setIsSwitchOn] = useState(
+    deviceFound.AlarmReport === 1 ? true : false
+  );
   // Modal
   const route = useRouter();
   // Dialog
   const [visibleDialog, setVisibleDialog] = useState(false);
-
-  const showDialog = () => setVisibleDialog(true);
-  const hideDialog = () => setVisibleDialog(false);
-  const handleAcceptTurnOffDevice = () => {
-    setIsSwitchOn(!isSwitchOn);
-    hideDialog();
+  const showDialog = () => {
+    if (deviceFound.sensors.AlarmSatus) {
+      setVisibleDialog(true);
+    } else {
+      Alert.alert("Thông báo", "Thiết bị phải reo chuông mới được tắt");
+    }
   };
-  console.log(deviceFound.updatedAt);
+  const hideDialog = () => setVisibleDialog(false);
+  const handleAcceptTurnOffDevice = async () => {
+    try {
+      await devicesService.toggleAlarm(
+        axiosClient,
+        currentUser?.user.customer_id ?? "",
+        typeof local.deviceId === "string" ? local.deviceId : ""
+      );
+      dispatch(
+        fetchDataDevices({
+          axiosClient,
+          customer_id: currentUser?.user.customer_id ?? "",
+        })
+      );
+      setIsSwitchOn(!isSwitchOn);
+      hideDialog();
+    } catch (error: any) {
+      console.log(error);
+      Alert.alert("Thông báo", `Hành động thất bại, lỗi ${error.message}`);
+    }
+  };
+  const voltage = deviceFound?.battery?.voltage || 3000;
+  const percentBattery = Math.round(((600 - (3600 - voltage)) * 100) / 600);
   return (
     <SafeAreaView style={{ display: "flex", height: "100%" }}>
       <View
@@ -136,9 +175,7 @@ const DeviceScreen: FunctionComponent<DeviceScreenProps> = () => {
           width={100}
           height={100}
           textSize={12}
-          value={Math.round(
-            (Number(deviceFound?.battery?.voltage ?? 0) / 5000) * 100
-          )}
+          value={percentBattery}
         ></BatteryCircle>
       </View>
 
@@ -172,7 +209,6 @@ const DeviceScreen: FunctionComponent<DeviceScreenProps> = () => {
               width={200}
               value={deviceFound?.sensors?.SmokeValue ?? 0}
               targetValue={1000}
-              status={isSwitchOn}
             ></CircularProgress>
           </View>
         </Surface>
@@ -186,11 +222,7 @@ const DeviceScreen: FunctionComponent<DeviceScreenProps> = () => {
             gap: 4,
           }}
         >
-          <Switch
-            value={isSwitchOn}
-            onValueChange={onToggleSwitch}
-            color="red"
-          />
+          <Switch value={isSwitchOn} onValueChange={showDialog} color="red" />
 
           <Text
             style={{
@@ -263,7 +295,7 @@ const DeviceScreen: FunctionComponent<DeviceScreenProps> = () => {
         }}
       >
         <IconButton
-          icon="power-standby"
+          icon={`${!isSwitchOn ? "bell-off-outline" : "bell-outline"}`}
           size={72}
           onPress={showDialog}
           iconColor={
@@ -276,7 +308,7 @@ const DeviceScreen: FunctionComponent<DeviceScreenProps> = () => {
           <Dialog.Title>Thông Báo</Dialog.Title>
           <Dialog.Content>
             <Text style={{ fontSize: 16 }}>
-              Bạn có muốn {isSwitchOn ? "tắt" : "mở"} thiết bị không!
+              Bạn có muốn {isSwitchOn ? "tắt" : "mở"} chuông thiết bị không!
             </Text>
           </Dialog.Content>
           <Dialog.Actions>
