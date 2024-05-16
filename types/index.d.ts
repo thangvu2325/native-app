@@ -33,6 +33,7 @@ export type deviceType = {
   AlarmReport: number;
   createdAt: Date;
   updatedAt: Date;
+  roomId: string;
 };
 export type sensorType = {
   id: string;

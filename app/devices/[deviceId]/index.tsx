@@ -28,6 +28,8 @@ import devicesService from "@/services/deviceService";
 import { createAxios } from "@/services/createInstance";
 import { loginSuccess } from "@/redux/slices/authSlice";
 import { fetchDataDevices } from "@/redux/slices/deviceSlice";
+import useMessage from "@/hook/useMessage";
+import { Socket } from "socket.io-client";
 
 interface DeviceScreenProps {} // Extend with StackScreenProps
 
@@ -65,6 +67,13 @@ const DeviceScreen: FunctionComponent<DeviceScreenProps> = () => {
       Alert.alert("Thông báo", "Thiết bị phải reo chuông mới được tắt");
     }
   };
+  const {
+    messageDeviceReceived,
+    messageReiceved,
+    messageOff,
+    joinRoom,
+    leaveRoom,
+  } = useMessage();
   const hideDialog = () => setVisibleDialog(false);
   const handleAcceptTurnOffDevice = async () => {
     try {
@@ -86,6 +95,15 @@ const DeviceScreen: FunctionComponent<DeviceScreenProps> = () => {
       Alert.alert("Thông báo", `Hành động thất bại, lỗi ${error.message}`);
     }
   };
+  useEffect(() => {
+    joinRoom(deviceFound.roomId);
+    messageDeviceReceived((message) => {
+      console.log(message);
+    });
+    return () => {
+      messageOff("device");
+    };
+  }, []);
   const voltage = deviceFound?.battery?.voltage || 3000;
   const percentBattery = Math.round(((600 - (3600 - voltage)) * 100) / 600);
   return (

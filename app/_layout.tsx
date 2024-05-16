@@ -40,6 +40,7 @@ import { persistor, store } from "@/redux/store";
 import { PersistGate } from "redux-persist/integration/react";
 import { Platform } from "react-native";
 import Constants from "expo-constants";
+import config from "@/config";
 
 global.Buffer = Buffer;
 
@@ -94,26 +95,6 @@ Notifications.setNotificationHandler({
   }),
 });
 
-// async function sendPushNotification(expoPushToken: string) {
-//   const message = {
-//     to: expoPushToken,
-//     sound: "default",
-//     title: "Original Title",
-//     body: "And here is the body!",
-//     data: { someData: "goes here" },
-//   };
-
-//   await fetch("https://exp.host/--/api/v2/push/send", {
-//     method: "POST",
-//     headers: {
-//       Accept: "application/json",
-//       "Accept-encoding": "gzip, deflate",
-//       "Content-Type": "application/json",
-//     },
-//     body: JSON.stringify(message),
-//   });
-// }
-
 function handleRegistrationError(errorMessage: string) {
   alert(errorMessage);
   throw new Error(errorMessage);
@@ -155,7 +136,7 @@ async function registerForPushNotificationsAsync() {
         await Notifications.getExpoPushTokenAsync({
           projectId,
         })
-      ).data;
+      )?.data;
       console.log(pushTokenString);
       return pushTokenString;
     } catch (e: unknown) {

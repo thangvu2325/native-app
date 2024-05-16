@@ -89,7 +89,7 @@ export default function ScanQRScreen() {
         const data: {
           deviceId: string;
           secretKey: string;
-        } = JSON.parse(code.data);
+        } = JSON.parse(code?.data);
 
         console.log(result);
       } else {
@@ -109,7 +109,7 @@ export default function ScanQRScreen() {
   ) => {
     setScanned(true);
     try {
-      const dataReq = JSON.parse(scanningResult.data);
+      const dataReq = JSON.parse(scanningResult?.data);
       const res = await userService.addDeviceforUser(
         axiosClient,
         currentUser?.user.customer_id ?? "",

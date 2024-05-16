@@ -1,4 +1,5 @@
 import devicesService from "@/services/deviceService";
+import { socketService } from "@/services/socketService";
 import { deviceType } from "@/types";
 import { Dispatch, createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { BaseThunkAPI } from "@reduxjs/toolkit/dist/createAsyncThunk";
@@ -26,7 +27,11 @@ export const fetchDataDevices = createAsyncThunk(
     customer_id: string;
   }) => {
     try {
-      const data = await devicesService.getAllDevices(axiosClient, customer_id);
+      const data: {
+        devices: deviceType[];
+        devicesCount: number;
+      } = await devicesService.getAllDevices(axiosClient, customer_id);
+
       return data;
     } catch (error) {
       console.log(error);

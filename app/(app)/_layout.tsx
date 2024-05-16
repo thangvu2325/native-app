@@ -12,12 +12,14 @@ import { AntDesign } from "@expo/vector-icons";
 import { useAppDispatch, useAppSelector } from "@/redux/hook";
 import { createAxios } from "@/services/createInstance";
 import { TokenData } from "@/types";
-import { useAuth } from "@/redux/selector";
+import { deviceSelector, useAuth } from "@/redux/selector";
 import { loginSuccess } from "@/redux/slices/authSlice";
 import { fetchDataDevices } from "@/redux/slices/deviceSlice";
 import { RootContext } from "../_layout";
 import config from "@/config";
 import { err } from "react-native-svg";
+import useMessage from "@/hook/useMessage";
+import { socketService } from "@/services/socketService";
 export const unstable_settings = {
   initialRouteName: "index",
 };
@@ -47,6 +49,7 @@ export default function TabLayout() {
     loginSuccess
   );
   const value = useContext(RootContext);
+
   useEffect(() => {
     const handleEnablePush = async () => {
       axiosClient

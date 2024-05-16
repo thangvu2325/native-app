@@ -32,22 +32,24 @@ class SocketService {
   disconnect() {
     this.socket.disconnect();
   }
-
+  off(event: any) {
+    this.socket.off(event);
+  }
   sendMessage(data: any) {
     this.socket.emit("message", data);
   }
-  subscribeToDeviceMessages(
-    messageHandler: ServerToClientEvents["deviceMessage"]
-  ) {
-    this.socket.on("deviceMessage", messageHandler);
-  }
-  subscribeToWarningMessages(
-    messageHandler: ServerToClientEvents["fireWarning"]
-  ) {
-    this.socket.on("fireWarning", messageHandler);
+  subscribeToDeviceMessages(messageHandler: ServerToClientEvents["device"]) {
+    this.socket.on("device", messageHandler);
   }
   subscribeToMessages(messageHandler: ServerToClientEvents["message"]) {
     this.socket.on("message", messageHandler);
+  }
+  joinRoom(roomId: string) {
+    this.socket.emit("join", roomId);
+  }
+
+  leaveRoom(roomId: string) {
+    this.socket.emit("leave", roomId);
   }
 }
 

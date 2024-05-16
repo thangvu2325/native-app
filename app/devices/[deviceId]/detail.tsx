@@ -218,7 +218,7 @@ const DetailScrren: FunctionComponent<DetailScrrenProps> = () => {
     setTitle("Thông tin thiết bị");
   }, []);
   const local = useLocalSearchParams();
-  const deviceList = useAppSelector(deviceSelector).data.devices;
+  const deviceList = useAppSelector(deviceSelector)?.data.devices;
   const deviceFound = deviceList.find(
     (device) => device?.deviceId === local?.deviceId
   );

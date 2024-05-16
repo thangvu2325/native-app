@@ -17,12 +17,11 @@ export interface AddMessageType {
 }
 export type ServerToClientEvents = {
   message: (data: string) => void;
-  deviceMessage: (data: IMessage) => void;
-  fireWarning: (data: IMessage) => void;
+  device: (data: IMessage) => void;
 };
 
 export interface ClientToServerEvents {
   message: (data: AddMessageDto) => void;
-  join: (roomId: number) => void;
-  leave: (roomId: number) => void;
+  join: (roomId: string) => void;
+  leave: (roomId: string) => void;
 }

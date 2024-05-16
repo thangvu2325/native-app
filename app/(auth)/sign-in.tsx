@@ -15,12 +15,7 @@ import Colors from "@/constants/Colors";
 import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
 import authService from "@/services/authService";
-import { useAppDispatch, useAppSelector } from "@/redux/hook";
-import { useAuth } from "@/redux/selector";
-import { createAxios } from "@/services/createInstance";
-import { TokenData } from "@/types";
-import { loginSuccess } from "@/redux/slices/authSlice";
-import TextInputIcon from "react-native-paper/lib/typescript/components/TextInput/Adornment/TextInputIcon";
+import { useAppDispatch } from "@/redux/hook";
 
 export type signInType = {
   email: string;
@@ -46,9 +41,9 @@ export default function SignIn() {
   const onSubmit = async (data: signInType) => {
     try {
       const res = await authService.login(data, dispatch, router);
-      Alert.alert("Thông báo", JSON.stringify(res));
+      // Alert.alert("Thông báo", JSON.stringify(res));
     } catch (error: any) {
-      console.log(JSON.stringify(error));
+      console.log(error);
       Alert.alert("Đăng nhập thất bại", "Email hoặc mật khẩu không đúng!");
     }
   };

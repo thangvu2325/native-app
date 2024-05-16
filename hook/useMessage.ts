@@ -1,4 +1,5 @@
 import { socketService } from "@/services/socketService";
+import { ro } from "react-native-paper-dates";
 
 const messageConnection = (token: string, customer_id: string) => {
   // Cấu hình các tiêu đề yêu cầu ở đây trước khi kết nối
@@ -11,16 +12,17 @@ const messageConnection = (token: string, customer_id: string) => {
   socketService.connectWithAuthToken(token, customer_id, headers);
 };
 const messageDeviceReceived = (handleMessage: (message: string) => void) => {
-  console.log(1);
   socketService.subscribeToDeviceMessages(handleMessage);
 };
-const messageFireWarning = (handleMessage: (message: string) => void) => {
-  socketService.subscribeToWarningMessages(handleMessage);
+
+const messageReiceved = (handleMessage: (message: string) => void) => {
+  socketService.subscribeToMessages(handleMessage);
 };
-const messageReiceved = () => {
-  socketService.subscribeToMessages((message) => {
-    return message;
-  });
+const joinRoom = (roomId: string) => {
+  socketService.joinRoom(roomId);
+};
+const leaveRoom = (roomId: string) => {
+  socketService.leaveRoom(roomId);
 };
 const messageSent = () => {
   const messageData = { text: "Hello, world!" };
@@ -29,12 +31,17 @@ const messageSent = () => {
 const messageDisconnect = () => {
   socketService.disconnect();
 };
+const messageOff = (event: any) => {
+  socketService.off(event);
+};
 const useMessage = () => ({
   messageConnection,
   messageReiceved,
   messageDisconnect,
+  messageOff,
   messageSent,
   messageDeviceReceived,
-  messageFireWarning,
+  joinRoom,
+  leaveRoom,
 });
 export default useMessage;

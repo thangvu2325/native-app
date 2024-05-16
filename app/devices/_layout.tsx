@@ -22,15 +22,15 @@ const DeviceLayout: FunctionComponent<DeviceLayoutProps> = () => {
   const pathname = usePathname();
   const local = useLocalSearchParams();
   const dispatch = useDispatch();
-  const { messageDeviceReceived } = useMessage();
-  useEffect(() => {
-    const handleListenDevice = async () => {
-      await messageDeviceReceived((message) => {
-        dispatch(updateDevices(JSON.parse(message)));
-      });
-    };
-    handleListenDevice();
-  }, []);
+  // const { messageDeviceReceived } = useMessage();
+  // useEffect(() => {
+  //   const handleListenDevice = async () => {
+  //     await messageDeviceReceived((message) => {
+  //       dispatch(updateDevices(JSON.parse(message)));
+  //     });
+  //   };
+  //   handleListenDevice();
+  // }, []);
   const { isLogin } = useAppSelector(useAuth);
   if (!isLogin) {
     // On web, static rendering will stop here as the user is not authenticated

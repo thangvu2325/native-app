@@ -55,7 +55,7 @@ export default function TabTwoScreen() {
   }, []);
   // Search Bar
   const [searchQuery, setSearchQuery] = React.useState("");
-  const deviceList = useAppSelector(deviceSelector).data
+  const deviceList = useAppSelector(deviceSelector)?.data
     ?.devices as deviceType[];
   return (
     <View style={styles.wrap}>

@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import SignIn from "@/app/(auth)/sign-in";
+import SignIn, { signInType } from "@/app/(auth)/sign-in";
 import config from "@/config";
 import useMessage from "@/hook/useMessage";
 import {
@@ -19,7 +19,7 @@ import { Dispatch } from "@reduxjs/toolkit";
 import axios, { AxiosInstance } from "axios";
 import { router } from "expo-router";
 import { ExpoRouter } from "expo-router/types/expo-router";
-const { messageConnection } = useMessage();
+const { messageConnection, messageDisconnect } = useMessage();
 
 const register = async (
   data: userRegister,
@@ -90,25 +90,22 @@ const resendVerifyKey = async (data: { email: string }) => {
   }
 };
 const login = async (
-  data: userLogin,
+  data: signInType,
   dispatch: Dispatch,
   router: ExpoRouter.Router
 ) => {
   try {
     dispatch(loginStart());
     const res = await axios.post(config.baseUrl + "/auth/login", data);
-    dispatch(loginSuccess(res.data));
+    dispatch(loginSuccess(res?.data));
     await messageConnection(
-      res.data?.backendTokens.accessToken,
-      res.data?.user.id
+      res?.data?.backendTokens.accessToken,
+      res?.data?.user.id
     );
-    // await messageDeviceReceived((message) => {
-    //   dispatch(updateDevices(JSON.parse(message)));
-    // });
     router.push("/(app)/");
-    return res.data;
+    return res?.data;
   } catch (error: any) {
-    dispatch(loginFailed(error.response.data.message));
+    dispatch(loginFailed(error.message));
     console.log(error);
     throw error;
   }
@@ -121,6 +118,7 @@ export const logOut = async (
   dispatch(logOutStart());
   try {
     await axiosClient.post("/auth/logout", { id: id });
+    messageDisconnect();
     dispatch(logOutSuccess());
   } catch (err) {
     dispatch(logOutFailed());
